@@ -1,0 +1,29 @@
+{
+  "name": "rnvconsole",
+  "version": "0.1.0",
+  "description": "vconsole for react native",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fwon/RNVConsole.git"
+  },
+  "keywords": [
+    "vconsole;",
+    "debugger;",
+    "console;",
+    "react-native;"
+  ],
+  "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.50.0"
+  },
+  "author": "fwon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fwon/RNVConsole/issues"
+  },
+  "homepage": "https://github.com/fwon/RNVConsole#readme"
+}
