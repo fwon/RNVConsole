@@ -34,10 +34,10 @@ render() {
 
 ## Examples
 
-![pic](https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole1.png)
+<img width="200" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole1.jpeg"/>
 
-![pic](https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole2.png)
+<img width="200" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole2.png"/>
 
-![pic](https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole3.png)
+<img width="200" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole3.jpeg"/>
 
-![pic](https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole4.png)
+<img width="200" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole4.jpeg"/>
