@@ -1,5 +1,6 @@
 # RNVConsole
-vConsole for react native, inspired by vconsole & vconsole-react-native
+vConsole for react native, inspired by vconsole & vconsole-react-native.
+Debugger on top of screen. Have a try in expo https://snack.expo.io/SklJHMS3S
 
 ## Features
 1. console[log, warn, error, info] in Log Panel.
