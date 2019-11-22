@@ -1,4 +1,3 @@
-/* eslint-disable no-cond-assign */
 export default class Event {
   constructor() {
     this.eventList = {}

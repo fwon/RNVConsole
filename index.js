@@ -13,10 +13,10 @@ import {
   StyleSheet,
   NativeModules
 } from 'react-native'
-import event from './event'
-import Network from './network'
-import Log from './console'
-import Info from './info'
+import event from './src/event'
+import Network from './src/network'
+import Log from './src/console'
+import Info from './src/info'
 
 const PANELS = ['Log', 'Network', 'Info']
 const { width, height } = Dimensions.get('window')
