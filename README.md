@@ -34,10 +34,14 @@ render() {
 
 ## Examples
 
-<img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole1.jpeg"/>
+### Log Panel
+<div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole1.jpeg"/></div>
 
-<img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole2.png"/>
+### Network Panel
+<div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole2.png"/></div>
 
-<img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole3.jpeg"/>
+### Info Panel
+<div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole3.jpeg"/></div>
 
-<img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole4.jpeg"/>
+### Dev Button
+<div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole4.jpeg"/></div>
