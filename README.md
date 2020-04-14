@@ -4,8 +4,9 @@ Debugger on top of screen. Have a try in expo https://snack.expo.io/SklJHMS3S
 
 ## Features
 1. console[log, warn, error, info] in Log Panel.
-2. Network request list & detail.
-3. Customized Version Info you want to show.
+2. exec Command to show message.
+3. Network request list & detail.
+4. Customized Version Info you want to show.
 
 ## Install
 ```
@@ -14,13 +15,26 @@ npm install rnvconsole
 
 ## Usage
 ```javascript
-/* INFO is optional */
+// Options
+import RN from 'react-native'
+import Native from '../native' // your own Module
+
+// Show app information in INFO panel
 const INFO = {
   version: '1.0.0',
   test_version: '4',
   message: 'test xxx features'
 }
-const RNVConsole = require('rnvconsole').showLogWhenDev(INFO)
+const options = {
+  info: INFO,
+  // global Object can be called in Command Input
+  global: {
+    rn: RN
+    native: Native
+  }
+}
+
+const RNVConsole = require('rnvconsole').showLogWhenDev(options)
 
 // in render function
 render() {
@@ -37,6 +51,10 @@ render() {
 
 ### Log Panel
 <div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole1.jpeg"/></div>
+
+### Command
+Object defined in global options can be call in command. Such as react-native module or your native function.
+<div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole5.jpeg"/></div>
 
 ### Network Panel
 <div align=center><img width="400" align="center" src="https://raw.githubusercontent.com/fwon/blog/master/assets/rnvconsole2.png"/></div>

@@ -11,7 +11,11 @@ import {
   Animated,
   Dimensions,
   StyleSheet,
-  NativeModules
+  TextInput,
+  Keyboard,
+  NativeModules,
+  Platform,
+  KeyboardAvoidingView
 } from 'react-native'
 import event from './src/event'
 import Network from './src/network'
@@ -21,11 +25,26 @@ import Info from './src/info'
 const PANELS = ['Log', 'Network', 'Info']
 const { width, height } = Dimensions.get('window')
 let AppInfo = {}
+let GlobalCommandObj = {}
+
+function evalInContext(js, context) {
+  return function(str) {
+    let result = ''
+    try {
+      // eslint-disable-next-line no-eval
+      result = eval(str)
+    } catch (err) {
+      result = '无效输入'
+    }
+    return event.trigger('addLog', result)
+  }.call(context, `with(this) { ${js} } `)
+}
 
 class RNVConsole extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
+      commandValue: '',
       showPanel: false,
       currentPanelTab: 'Log',
       pan: new Animated.ValueXY(),
@@ -72,6 +91,12 @@ class RNVConsole extends PureComponent {
     NativeModules.DevMenu.reload()
   }
 
+  execCommand = () => {
+    const context = GlobalCommandObj
+    evalInContext(this.state.commandValue, context)
+    Keyboard.dismiss()
+  }
+
   renderPanelHeader() {
     return (
       <View style={styles.panelHeader}>
@@ -91,6 +116,23 @@ class RNVConsole extends PureComponent {
             <Text style={styles.panelHeaderItemText}>{type}</Text>
           </TouchableOpacity>
         ))}
+      </View>
+    )
+  }
+
+  renderCommandBar() {
+    return (
+      <View style={styles.commandBar}>
+        <TextInput
+          style={styles.commandBarInput}
+          placeholder="command..."
+          // eslint-disable-next-line no-return-assign
+          onChangeText={text => this.setState({ commandValue: text })}
+          value={this.state.commandValue}
+        />
+        <TouchableOpacity style={styles.commandBarBtn} onPress={() => this.execCommand()}>
+          <Text style={styles.commandBarBtnText}>OK</Text>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -127,13 +169,17 @@ class RNVConsole extends PureComponent {
       Empty: this.renderEmptyPanel()
     }
     return (
-      <View style={styles.panel}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.panel}
+      >
         {this.renderPanelHeader()}
         <View style={styles.panelContent}>
           {panels[this.state.currentPanelTab || 'Log'] || panels.Empty}
         </View>
+        {this.renderCommandBar()}
         {this.renderPanelFooter()}
-      </View>
+      </KeyboardAvoidingView>
     )
   }
 
@@ -235,13 +281,31 @@ const styles = StyleSheet.create({
   },
   homeBtnText: {
     color: '#fff'
+  },
+  commandBar: {
+    height: 40,
+    flexDirection: 'row',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#d9d9d9'
+  },
+  commandBarInput: {
+    flex: 1,
+    paddingLeft: 10
+  },
+  commandBarBtn: {
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eee'
   }
 })
 
 module.exports = {
   Panel: RNVConsole,
-  showLogWhenDev(info) {
-    AppInfo = info
+  showLogWhenDev(options) {
+    options = options || {}
+    AppInfo = options.info || ''
+    GlobalCommandObj = options.global || {}
     return global.__DEV__ ? <RNVConsole /> : null
   }
 }

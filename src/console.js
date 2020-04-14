@@ -58,8 +58,9 @@ class Console extends Component {
     }
     logStack.attach(() => {
       if (this.mountState) {
+        const logs = logStack.getLogs()
         this.setState({
-          logs: logStack.getLogs()
+          logs
         })
       }
     })
@@ -70,19 +71,26 @@ class Console extends Component {
     this.setState({
       logs: logStack.getLogs()
     })
-    event.on('clear', this.clearLogs.bind(this))
+    // 类方法用bind会指向不同地址，导致off失败
+    event.on('clear', this.clearLogs)
+    event.on('addLog', this.addLog)
   }
 
   componentWillUnmount() {
     this.mountState = false
-    event.off('clear', this.clearLogs.bind(this))
+    event.off('clear', this.clearLogs)
+    event.off('addLog', this.addLog)
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.logs.length !== this.state.logs.length
   }
 
-  clearLogs(name) {
+  addLog = msg => {
+    logStack.addLog('log', [msg])
+  }
+
+  clearLogs = name => {
     if (name === this.name) {
       logStack.clearLogs()
     }
@@ -107,9 +115,9 @@ class Console extends Component {
         ref={ref => {
           this.flatList = ref
         }}
-        // onContentSizeChange={() => this.flatList.scrollToEnd({ animated: true })}
+        legacyImplementation
         // onLayout={() => this.flatList.scrollToEnd({ animated: true })}
-        initialNumToRender={20}
+        // initialNumToRender={20}
         showsVerticalScrollIndicator
         extraData={this.state}
         data={this.state.logs}
@@ -178,7 +186,11 @@ function formatLog(obj) {
     return `Array(${obj.length})[${obj.map(elem => formatLog(elem))}]`
   }
   if (obj.toString) {
-    return `object(${JSON.stringify(obj, null, 2)})`
+    try {
+      return `object(${JSON.stringify(obj, null, 2)})`
+    } catch (err) {
+      return '非法输入'
+    }
   }
   return 'unknown data'
 }
