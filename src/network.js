@@ -46,7 +46,8 @@ class AjaxStack {
       status: item.status,
       method: item.method || '-',
       costTime: item.costTime > 0 ? `${item.costTime}ms` : '-',
-      header: item.header || null,
+      requestHeader: item.requestHeader || null,
+      responseHeader: item.responseHeader || null,
       getData: item.getData || null,
       postData: item.postData || null,
       response: null,
@@ -212,17 +213,20 @@ class Network extends Component {
             <View>
               <Text style={[styles.nwItemDetailHeader, styles.bold]}>General</Text>
               <View style={styles.nwDetailItem}>
-                <Text>URL:</Text>
-                <Text>{_item.url}</Text>
+                <Text selectable style={styles.headers}>
+                  {_item.url}
+                </Text>
               </View>
             </View>
-            {_item.header && (
+            {_item.requestHeader && (
               <View>
-                <Text style={[styles.nwItemDetailHeader, styles.bold]}>Header</Text>
-                {Object.keys(_item.header).map(key => (
-                  <View style={styles.nwDetailItem} key={key}>
-                    <Text>{key}:</Text>
-                    <Text>{_item.header[key]}</Text>
+                <Text style={[styles.nwItemDetailHeader, styles.bold]}>Request Header</Text>
+                {Object.keys(_item.requestHeader).map(key => (
+                  <View style={[styles.nwDetailItem, styles.headers]} key={key}>
+                    <Text style={styles.headerLeft}>{key}:</Text>
+                    <Text selectable style={styles.headerRight}>
+                      {_item.requestHeader[key]}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -233,9 +237,11 @@ class Network extends Component {
                   Query String Parameters
                 </Text>
                 {Object.keys(_item.getData).map(key => (
-                  <View style={styles.nwDetailItem} key={key}>
-                    <Text>{key}:</Text>
-                    <Text>{_item.getData[key]}</Text>
+                  <View style={[styles.nwDetailItem, styles.headers]} key={key}>
+                    <Text style={styles.headerLeft}>{key}:</Text>
+                    <Text selectable style={styles.headerRight}>
+                      {_item.getData[key]}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -246,7 +252,20 @@ class Network extends Component {
                 {Object.keys(_item.postData).map(key => (
                   <View style={styles.nwDetailItem} key={key}>
                     <Text>{key}:</Text>
-                    <Text>{_item.postData[key]}</Text>
+                    <Text selectable>{_item.postData[key]}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+            {_item.responseHeader && (
+              <View>
+                <Text style={[styles.nwItemDetailHeader, styles.bold]}>Response Header</Text>
+                {Object.keys(_item.responseHeader).map(key => (
+                  <View style={[styles.nwDetailItem, styles.headers]} key={key}>
+                    <Text style={styles.headerLeft}>{key}:</Text>
+                    <Text selectable style={styles.headerRight}>
+                      {_item.responseHeader[key]}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -254,7 +273,7 @@ class Network extends Component {
             <View>
               <Text style={[styles.nwItemDetailHeader, styles.bold]}>Response</Text>
               <View style={styles.nwDetailItem}>
-                <Text>{_item.response || ''}</Text>
+                <Text selectable>{_item.response || ''}</Text>
               </View>
             </View>
           </View>
@@ -319,6 +338,22 @@ const styles = StyleSheet.create({
   },
   nwDetailItem: {
     paddingLeft: 5
+  },
+  headers: {
+    flexDirection: 'row',
+    paddingVertical: 2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc'
+  },
+  headerLeft: {
+    flex: 1,
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc'
+  },
+  headerRight: {
+    flex: 2,
+    paddingLeft: 10,
+    color: '#aaa'
   }
 })
 
@@ -352,7 +387,6 @@ function proxyAjax(XHR, stack) {
     const _onreadystatechange = XMLReq.onreadystatechange || function() {}
     const onreadystatechange = function() {
       const item = stack.getRequest(id)
-
       // update status
       item.readyState = XMLReq.readyState
       item.status = 0
@@ -373,21 +407,16 @@ function proxyAjax(XHR, stack) {
         }
       } else if (XMLReq.readyState === 2) {
         // HEADERS_RECEIVED
-        item.header = {}
-        const header = XMLReq.getAllResponseHeaders() || ''
-        const headerArr = header.split('\n')
-        // extract plain text to key-value format
-        for (let i = 0; i < headerArr.length; i++) {
-          const line = headerArr[i]
-          if (!line) {
-            // eslint-disable-next-line no-continue
-            continue
-          }
-          const arr = line.split(': ')
-          const key = arr[0]
-          const value = arr.slice(1).join(': ')
-          item.header[key] = value
-        }
+        item.responseHeader = {}
+        const arr = headers.trim().split(/[\r\n]+/)
+
+        // Create a map of header names to values
+        arr.forEach(line => {
+          const parts = line.split(': ')
+          const header = parts.shift()
+          const value = parts.join(': ')
+          item.responseHeader[header] = value
+        })
       } else if (XMLReq.readyState === 3) {
         // LOADING
       } else if (XMLReq.readyState === 4) {
@@ -427,7 +456,6 @@ function proxyAjax(XHR, stack) {
 
     const item = stack.getRequest(XMLReq._requestID)
     item.method = XMLReq._method.toUpperCase()
-
     let query = XMLReq._url.split('?') // a.php?b=c&d=?e => ['a.php', 'b=c&d=', '?e']
     item.url = query.shift() // => ['b=c&d=', '?e']
 
@@ -439,6 +467,10 @@ function proxyAjax(XHR, stack) {
         q = q.split('=')
         item.getData[q[0]] = decodeURIComponent(q[1])
       }
+    }
+
+    if (XMLReq._headers) {
+      item.requestHeader = XMLReq._headers
     }
 
     if (item.method === 'POST') {
